@@ -1,0 +1,15 @@
+START_WORD = '<begin>'
+END_WORD = '<end>'
+UNK_WORD = '<unk>'
+
+MAX_CAPTIONS = 5
+MAX_LENGTH_CAP = 60
+
+TRAIN_VAL_SPLIT = 0.8
+BATCH_SIZE = 2
+
+SEED = 1339
+LEARNING_RATE = 0.001
+EPOCHS = 20
+
+MODEL_DIR = './models/'
