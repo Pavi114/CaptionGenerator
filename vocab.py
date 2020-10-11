@@ -19,12 +19,20 @@ class Vocabulary():
          print("Building Vocab...")
          caps_data = pd.read_csv(os.path.join(self.caps_file))
 
-         tokens = []
+         counter = {}
 
          for _, cap_data in caps_data.iterrows():
-             tokens.extend(self.tokenize(cap_data))
-        
-         self.words = list(set(tokens))
+             words = self.tokenize(cap_data)
+             for _, word in enumerate(words):
+                 if word in counter:
+                    counter[word] += 1
+                 else:
+                    counter[word] = 1
+             
+
+         for word, count in counter.items():
+             if count > 2:
+                 self.words.append(word)
          
          self.words.extend([START_WORD, END_WORD, UNK_WORD])
 
@@ -45,7 +53,7 @@ class Vocabulary():
             caption = caption_ann['caption' + str(i)]
             if isinstance(caption, str):
                 self.max_length = max(self.max_length, len(caption))
-                tokens.extend(word_tokenize(caption))
+                tokens.extend(word_tokenize(caption.lower()))
         return tokens
     
     def convert_to_tensor(self, caption):

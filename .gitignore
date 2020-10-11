@@ -2,4 +2,3 @@ __pycache__
 .vscode
 ./models
 dataset.ipynb
-captions.csv
