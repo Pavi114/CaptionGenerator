@@ -47,7 +47,7 @@ class CustomDataset(Dataset):
         
         image = self.coco.loadImgs([int(img_id)])
         image = Image.open(os.path.join(self.root_dir, self.image_dir, image[0]['file_name'])).convert('RGB')
-        image = self.transform(image)
+        image = self.transform(image).cuda()
 
         cap_data = self.caps_data[self.caps_data['img_id'] == int(img_id)]
         captions = cap_data['caption' + str(cap_num)]

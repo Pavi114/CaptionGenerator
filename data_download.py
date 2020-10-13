@@ -7,13 +7,13 @@ import pandas as pd
     Download image and caption annotations file from COCO site
 """
 
-direc = '../COCO/' # COCO Direc
+direc = '/media/aananth/OS/Users/aanan/Documents/COCO/' # COCO Direc
 data_type = 'train2014' # Data file to be used
 
-img_ann_path = '{}annotations_trainval2014/annotations/instances_{}.json'.format(direc, data_type)
+img_ann_path = '{}instances_{}.json'.format(direc, data_type)
 coco_imgs = COCO(img_ann_path)
 
-caps_ann_path = '{}annotations_trainval2014/annotations/captions_{}.json'.format(direc, data_type)
+caps_ann_path = '{}captions_{}.json'.format(direc, data_type)
 coco_caps = COCO(caps_ann_path)
 
 def fetch_images():
@@ -73,10 +73,10 @@ def download_images(image_info):
 
 def convert_dict_to_df(caption_data, csv_path):
     df = pd.DataFrame(caption_data, columns=['img_id', 'caption0', 'caption1', 'caption2', 'caption3', 'caption4'])
-    df.to_csv('./captions.csv', index=False) # replace with csv path
+    df.to_csv(f'{direc}captions.csv', index=False) # replace with csv path
 
 
 image_info = fetch_images()
 image_caption_data = download_images(image_info)
-convert_dict_to_df(image_caption_data, './captions.csv')
+convert_dict_to_df(image_caption_data, f'{direc}captions.csv')
 

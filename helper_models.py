@@ -1,5 +1,7 @@
-from torch import cat
+import numpy as np
+from torch import cat, cuda
 from torch.nn import Module, Sequential, Linear, LSTM, Embedding, Softmax
+from torch.functional import F
 from torchvision.models import vgg16_bn
 from constants import *
 
@@ -12,13 +14,15 @@ class Encoder(Module):
         # print(self.model)
     
     def forward(self, image):
-        print("\t\tExtracting features")
+        # print("\t\tExtracting features")
         features = self.model(image)
         features = features.view(features.size(0), -1)
-        features = self.embed(features)
-        print("\t\tFeatures extracted")
-        return features
 
+        # detached = features.detach().clone()
+        features = self.embed(features)
+
+        # print("\t\tFeatures extracted")
+        return features
 
 class Decoder(Module):
     def __init__(self, lstm_units, embed_size, num_layers, vocab_size):
@@ -29,34 +33,40 @@ class Decoder(Module):
         self.vocab_size = vocab_size
         self.embed = Embedding(self.vocab_size, self.embed_size)
         self.lstm = LSTM(self.embed_size, self.lstm_units, self.num_layers, batch_first=True, bias=True)
+        print(self.vocab_size)
         self.linear = Linear(self.lstm_units, vocab_size)
-        self.sf = Softmax(dim=1)
     
-    def forward(self, caption, image_features, hidden):
-        print("\t\tRunning LSTM")
+    def forward(self, caption, image_features, hidden = None):
+        # print("\t\tRunning LSTM")
         caption = caption[:,:-1]
         embed = self.embed(caption)
         inputs = cat((image_features.unsqueeze(1), embed), 1)
         outputs, hidden = self.lstm(inputs, hidden)
         logits = self.linear(outputs)
-        logits = self.sf(logits)
-        print("\t\tLSTM Done.")
+        # logits = self.sf(logits)
+        # print("\t\tLSTM Done.")
         return logits, hidden
     
     def predict(self, features):
-        predicted_ids = []
+        image_features = features
+        predicted_ids = [[] for i in range(4)]
         prev_state = None
-        for _ in  range(10):
-            hiddens, prev_state = self.lstm(features, prev_state)
-            logits = self.linear(hiddens.squeeze(1))
+        for i in range(4):
+            features = image_features
+            prev_state = None
+            for _ in  range(10):
+                hiddens, prev_state = self.lstm(features, prev_state)
 
-            predicted_id = logits.argmax(1)
-            predicted_ids.append(predicted_id.item())
+                logits = self.linear(hiddens).squeeze()
 
-            features = self.embed(predicted_id)
-            print(features.shape)
-            features = features.unsqueeze(1)
-        
+                predicted_id = np.random.choice(range(self.vocab_size), p=F.softmax(logits, 0).detach().cpu().numpy())
+
+                predicted_ids[i].append(predicted_id)
+
+                features = self.embed(cuda.LongTensor([predicted_id]))
+                # print(features.shape)
+                features = features.unsqueeze(1)
+
         return predicted_ids
     
     def init_hidden(self, batch_size):

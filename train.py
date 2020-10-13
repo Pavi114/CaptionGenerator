@@ -12,18 +12,23 @@ transform = transforms.Compose([
 )
 
 caption_generator = CaptionGenerator(
-    '../COCO/', 
-    './captions.csv', 
-    'annotations_trainval2014/annotations/instances_train2014.json',
+    '/media/aananth/OS/Users/aanan/Documents/COCO/', 
+    '/media/aananth/OS/Users/aanan/Documents/COCO/captions.csv', 
+    'instances_train2014.json',
     'train/images/',
     transform=transform
 )
 
+# Load model
+model_path = '/home/aananth/dev/CaptionGenerator/models/epoch-2.pkl'
+caption_generator.load_model(model_path)
+
 ## comment while predicting
-caption_generator.train(EPOCHS)
+# caption_generator.train(EPOCHS)
 
 ### to fill
-image_path = ''
-model_path = ''
-caption_generator.load_model(model_path)
+image_path = '/home/aananth/dev/CaptionGenerator/61-l8S81xVL._SL1500_.jpg'
+caption_generator.predict_using_sampling(image_path)
+
+image_path = '/home/aananth/dev/CaptionGenerator/1.jpg'
 caption_generator.predict_using_sampling(image_path)

@@ -2,8 +2,10 @@ import os
 import pandas as pd
 from nltk.tokenize import word_tokenize
 from constants import *
-from torch import Tensor
+from torch import Tensor, cuda
 import math
+
+from collections import defaultdict
 
 class Vocabulary():
     def __init__(self, root_dir, captions_file_name):
@@ -16,29 +18,25 @@ class Vocabulary():
         self.build_vocab()
         
     def build_vocab(self):
-         print("Building Vocab...")
-         caps_data = pd.read_csv(os.path.join(self.caps_file))
+        print("Building Vocab...")
+        caps_data = pd.read_csv(os.path.join(self.caps_file))
 
-         counter = {}
+        counter = defaultdict(int)
 
-         for _, cap_data in caps_data.iterrows():
-             words = self.tokenize(cap_data)
-             for _, word in enumerate(words):
-                 if word in counter:
-                    counter[word] += 1
-                 else:
-                    counter[word] = 1
-             
+        for _, cap_data in caps_data.iterrows():
+            words = self.tokenize(cap_data)
+            for _, word in enumerate(words):
+                counter[word] += 1
+            
 
-         for word, count in counter.items():
-             if count > 2:
-                 self.words.append(word)
-         
-         self.words.extend([START_WORD, END_WORD, UNK_WORD])
+        for word, count in counter.items():
+            if count > 2:
+                self.words.append(word)
+        
+        self.words.extend([START_WORD, END_WORD, UNK_WORD])
 
-         for i, word in enumerate(self.words):
-             self.encode_word(word, i)
-         print(self.int2word)
+        for i, word in enumerate(self.words):
+            self.encode_word(word, i)
 
     def encode_word(self, word, num):
         if num not in self.int2word:
@@ -63,11 +61,11 @@ class Vocabulary():
         
         tokens = [self.word2int[START_WORD]]
         for _, token in enumerate(caption):
-            token = (self.word2int[token] if self.word2int[token] else self.word2int[UNK_WORD])
+            token = (self.word2int[token] if token in self.word2int else self.word2int[UNK_WORD])
             tokens.append(token)
         for _ in range(len(tokens), self.max_length + 2):
             tokens.append(self.word2int[END_WORD])
-        tokens = Tensor(tokens).long()
+        tokens = cuda.LongTensor(tokens)
 
         return tokens
 
