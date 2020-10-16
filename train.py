@@ -19,4 +19,11 @@ caption_generator = CaptionGenerator(
     transform=transform
 )
 
+## comment while predicting
 caption_generator.train(EPOCHS)
+
+### to fill
+image_path = ''
+model_path = ''
+caption_generator.load_model(model_path)
+caption_generator.predict_using_sampling(image_path)

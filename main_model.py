@@ -2,7 +2,7 @@ import numpy as np
 import math
 import os
 
-from torch import Tensor, reshape, save
+from torch import Tensor, reshape, save, unsqueeze, load
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from constants import *
@@ -29,7 +29,8 @@ class CaptionGenerator():
         self.num_val_batches = math.ceil(
             ((1 - TRAIN_VAL_SPLIT) * len(self.val_loader.dataset)) / self.val_loader.batch_sampler.batch_size
         )
-    
+        self.dataset = CustomDataset(root_dir, captions_file_name, instances_ann_name, image_dir, mode, transform)
+
     def train(self, epochs):
 
         loss_fn = CrossEntropyLoss()
@@ -187,3 +188,17 @@ class CaptionGenerator():
         print("val train split done.")
 
         return (train_loader, val_loader)
+    
+    def load_model(self, path):
+        checkpoint = load(path)
+        self.encoder.load_state_dict(checkpoint['cnn'])
+        self.decoder.load_state_dict(checkpoint['rnn'])
+
+    def predict_using_sampling(self, image):
+        image = self.train_loader.dataset.transform(image)
+        image = unsqueeze(image, 0)
+        print(image.shape)
+        features = self.encoder(image)
+        caption_ids = self.decoder.predict(features)
+        caption = self.train_loader.dataset.vocab.get_caption(caption_ids)
+        print(caption)

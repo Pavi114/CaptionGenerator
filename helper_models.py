@@ -43,6 +43,22 @@ class Decoder(Module):
         print("\t\tLSTM Done.")
         return logits, hidden
     
+    def predict(self, features):
+        predicted_ids = []
+        prev_state = None
+        for _ in  range(10):
+            hiddens, prev_state = self.lstm(features, prev_state)
+            logits = self.linear(hiddens.squeeze(1))
+
+            predicted_id = logits.argmax(1)
+            predicted_ids.append(predicted_id.item())
+
+            features = self.embed(predicted_id)
+            print(features.shape)
+            features = features.unsqueeze(1)
+        
+        return predicted_ids
+    
     def init_hidden(self, batch_size):
         weights = next(self.parameters()).data
         return (weights.new(self.num_layers, batch_size, self.lstm_units).zero_(), 
