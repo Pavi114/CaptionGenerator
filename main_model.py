@@ -117,7 +117,11 @@ class CaptionGenerator():
         with no_grad():
             for batch in range(1, self.num_val_batches + 1): # should be replaced with self.num_val_batches
 
+<<<<<<< HEAD
                 # print("\tBatch: {}".format(batch))
+=======
+            # print("\tBatch: {}".format(batch))
+>>>>>>> temp
 
                 indices = self.val_loader.dataset.get_ids()
                 new_sampler = SubsetRandomSampler(indices=indices)
