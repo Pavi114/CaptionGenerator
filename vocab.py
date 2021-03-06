@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 from nltk.tokenize import word_tokenize
 from constants import *
 from torch import Tensor, cuda
@@ -15,7 +16,9 @@ class Vocabulary():
         self.int2word = {}
         self.words = []
         self.max_length = -1
+        self.embeddings = []
         self.build_vocab()
+        self.build_embeddings()
         
     def build_vocab(self):
         print("Building Vocab...")
@@ -37,6 +40,18 @@ class Vocabulary():
 
         for i, word in enumerate(self.words):
             self.encode_word(word, i)
+    
+    def build_embeddings(self):
+        from embed_glove import embed_captions
+
+        self.embedding_matrix = np.zeros((self.get_vocab_size, EMBED_SIZE))
+        embeddings_index = embed_captions()
+
+        for word, i in self.word2int.items():
+            embedding_vector = embeddings_index.get(word)
+            if embedding_vector is not None:
+                self.embedding_matrix[i] = embedding_vector
+        # print(self.embedding_matrix[0])
 
     def encode_word(self, word, num):
         if num not in self.int2word:

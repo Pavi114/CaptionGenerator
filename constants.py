@@ -2,6 +2,8 @@ START_WORD = '<begin>'
 END_WORD = '<end>'
 UNK_WORD = '<unk>'
 
+EMBED_SIZE = 100
+
 MAX_CAPTIONS = 5
 MAX_LENGTH_CAP = 60
 

@@ -19,7 +19,7 @@ class CaptionGenerator():
         (self.train_loader, self.val_loader) = self.get_data_loader(root_dir, captions_file_name, instances_ann_name, image_dir, mode, transform)
         self.device = device('cuda')
         self.encoder = Encoder(embed_size).to(self.device)
-        self.decoder = Decoder(lstm_units, embed_size, num_layers, self.train_loader.dataset.vocab.get_vocab_size()).to(self.device)
+        self.decoder = Decoder(lstm_units, embed_size, num_layers, self.train_loader.dataset.vocab.get_vocab_size(), self.train_loader.dataset.vocab.embedding_matrix).to(self.device)
         self.loss = []
         self.val_loss = []
         self.bleu_scores = []
@@ -117,11 +117,7 @@ class CaptionGenerator():
         with no_grad():
             for batch in range(1, self.num_val_batches + 1): # should be replaced with self.num_val_batches
 
-<<<<<<< HEAD
-                # print("\tBatch: {}".format(batch))
-=======
             # print("\tBatch: {}".format(batch))
->>>>>>> temp
 
                 indices = self.val_loader.dataset.get_ids()
                 new_sampler = SubsetRandomSampler(indices=indices)

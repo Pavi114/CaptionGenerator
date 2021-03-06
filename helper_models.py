@@ -25,13 +25,13 @@ class Encoder(Module):
         return features
 
 class Decoder(Module):
-    def __init__(self, lstm_units, embed_size, num_layers, vocab_size):
+    def __init__(self, lstm_units, embed_size, num_layers, vocab_size, embedding_weights):
         super(Decoder, self).__init__()
         self.lstm_units = lstm_units
         self.embed_size = embed_size
         self.num_layers = num_layers
         self.vocab_size = vocab_size
-        self.embed = Embedding(self.vocab_size, self.embed_size)
+        self.embed = Embedding(self.vocab_size, self.embed_size, trainable=False, embeddings_initializer=embedding_weights)
         self.lstm = LSTM(self.embed_size, self.lstm_units, self.num_layers, batch_first=True, bias=True)
         print(self.vocab_size)
         self.linear = Linear(self.lstm_units, vocab_size)
