@@ -14,7 +14,7 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from PIL import Image
 
 class CaptionGenerator():
-    def __init__(self, root_dir, captions_file_name, instances_ann_name, image_dir, transform, embed_size=512, num_layers=1, lstm_units=512, mode='train'):
+    def __init__(self, root_dir, captions_file_name, instances_ann_name, image_dir, transform, embed_size=100, num_layers=1, lstm_units=512, mode='train'):
         print("INIT")
         (self.train_loader, self.val_loader) = self.get_data_loader(root_dir, captions_file_name, instances_ann_name, image_dir, mode, transform)
         self.device = device('cuda')
